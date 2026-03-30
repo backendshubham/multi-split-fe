@@ -25,7 +25,16 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [selectedUPI, setSelectedUPI] = useState('Google Pay');
 
-  // Initial Wake-Up Connection
+  // Load Razorpay Script Dynamically
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+    return () => { document.body.removeChild(script); };
+  }, []);
+
+  // Initial Wake-Up Connection (Render Free Tier Fix)
   useEffect(() => {
     const pingServer = async () => {
       try { await axios.get(API_BASE.replace('/api', '')); } catch (err) {}
