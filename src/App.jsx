@@ -26,7 +26,18 @@ const App = () => {
 
   // UI Flow States
   const [loading, setLoading] = useState(false);
+  const [isWakingUp, setIsWakingUp] = useState(false);
   const [showBottomSDK, setShowBottomSDK] = useState(false);
+
+  // --- Initial Wake-Up Connection (Render Free Tier Fix) ---
+  useEffect(() => {
+    const pingServer = async () => {
+      try {
+        await axios.get(API_BASE.replace('/api', '')); // Root ping
+      } catch (err) { /* Silent fail is okay */ }
+    };
+    pingServer();
+  }, []);
 
   // --- Session Timer (State Persistence) ---
   useEffect(() => {
@@ -155,7 +166,14 @@ const App = () => {
               </div>
 
               <button className="btn-action" onClick={initializeSession} disabled={loading}>
-                {loading ? <div className="loader-ring"></div> : <><span>Initialize Multi-Leg Flow</span> <Zap size={18} /></>}
+                {loading ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div className="loader-ring"></div>
+                    <span style={{ fontSize: '14px', textTransform: 'none' }}>Waking Up Orchestrator...</span>
+                  </div>
+                ) : (
+                  <><span>Initialize Multi-Leg Flow</span> <Zap size={18} /></>
+                )}
               </button>
             </motion.div>
           )}
